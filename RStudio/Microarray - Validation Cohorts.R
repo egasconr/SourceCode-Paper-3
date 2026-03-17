@@ -690,14 +690,36 @@ data.mod.t.filter_PD_total <- corrected_expr_dataframe %>%
 write.csv(data.mod.t.filter_PD_total, "PD_combined_corrected_data.csv", row.names = FALSE)
 
 # PCA Visualization (Before vs After)
-pca_before <- prcomp(t(expr_matrix), scale. = TRUE)
-pca_after <- prcomp(t(corrected_expr_matrix), scale. = TRUE)
+pca_before <- prcomp(expr_matrix, scale. = TRUE)
+pca_after <- prcomp(corrected_expr_matrix, scale. = TRUE)
 
-# Plot
-par(mfrow=c(1,2))
+# Initial Plot
 plot(pca_before$x[, 1:2], col = as.factor(batch), main = "Parkinson's PCA before ComBat (Batch Color)")
 plot(pca_after$x[, 1:2], col = as.factor(diagnosis), main = "Parkinson's PCA after ComBat (Diagnosis Color)")
-par(mfrow=c(1,1))
+
+# Calculation of the percentage of variance for each PCA
+var_before <- round(100 * pca_before$sdev^2 / sum(pca_before$sdev^2), 1)
+var_after  <- round(100 * pca_after$sdev^2 / sum(pca_after$sdev^2), 1)
+
+# Plot with percentage of variance
+#Before
+png("PCA_before.png", width = 20, height = 15, units = "cm", res = 600)
+plot(pca_before$x[, 1:2], 
+     col = as.factor(batch), 
+     main = "Parkinson's PCA before ComBat",
+     xlab = paste0("PC1 (", var_before[1], "%)"),
+     ylab = paste0("PC2 (", var_before[2], "%)"),
+     pch = 19) 
+dev.off()
+#After
+png("PCA_after.png", width = 20, height = 15, units = "cm", res = 600)
+plot(pca_after$x[, 1:2], 
+     col = as.factor(diagnosis), 
+     main = "Parkinson's PCA after ComBat",
+     xlab = paste0("PC1 (", var_after[1], "%)"),
+     ylab = paste0("PC2 (", var_after[2], "%)"),
+     pch = 19)
+dev.off()
 
 
 # ==============================================================================
